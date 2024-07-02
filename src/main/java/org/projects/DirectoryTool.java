@@ -14,6 +14,10 @@ public class DirectoryTool {
         return parentDirectory;
     }
 
+    public String getCurrentDirectory() {
+        return currentDirectory;
+    }
+
     public void createDirectory(String year, String date) {
         createYearDirectory(year);
         createDateDirectory(date);

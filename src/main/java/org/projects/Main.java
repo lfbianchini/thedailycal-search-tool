@@ -49,12 +49,4 @@ public class Main {
 
         scanner.close();
     }
-
-    private static void connectDriver() {
-
-    }
-
-    private static boolean badURl() {
-        return true;
-    }
 }

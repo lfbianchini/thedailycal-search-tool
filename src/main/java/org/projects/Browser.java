@@ -3,15 +3,20 @@ package org.projects;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class Browser {
-    private final WebDriver driver;
+    private WebDriver driver;
     private String url;
-    private DirectoryTool dTool;
+    private final DirectoryTool dTool;
 
     public Browser(String url, String parentDirectory) {
         this.url = url;
@@ -28,16 +33,32 @@ public class Browser {
         String year = parts[2];
 
         createDirectory(year, date);
+        setBrowserDownloadPath(dTool.getCurrentDirectory());
+        WebElement downloadNodeParent = driver.findElement(By.cssSelector("#record-files-list > tbody:nth-child(2)"));
+        List<WebElement> downloadNodesList = downloadNodeParent.findElements(By.tagName("tindui-app-file-download-link"));
+        for(WebElement downloadNode : downloadNodesList) {
+            String url = downloadNode.getAttribute("url");
+            driver.get(url);
+        }
+    }
 
-
+    private void setBrowserDownloadPath(String path) {
+        Map<String, Object> chromePrefs  = new HashMap<String, Object>();
+        chromePrefs.put("download.default_directory", path);
+        chromePrefs.put("download.directory_upgrade", true);
+        chromePrefs.put("browser.set_download_behavior", "allow");
+        chromePrefs.put("download.prompt_for_download", false);
+        ChromeOptions newOptions = new ChromeOptions();
+        newOptions.setExperimentalOption("prefs", chromePrefs);
+        driver.quit();
+        driver = new ChromeDriver(newOptions);
+        driver.get(url);
     }
 
     private void createDirectory(String year, String date) {
         dTool.createYearDirectory(year);
         dTool.createDateDirectory(date);
     }
-
-
 
     private void checkIfValidUrl() {
         System.out.println("Checking if URL is valid");
