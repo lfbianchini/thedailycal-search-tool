@@ -23,6 +23,10 @@ public class DirectoryTool {
         createDateDirectory(date);
     }
 
+    public void renameFilesInCurrentDirectory() {
+
+    }
+
     public void createDateDirectory(String date) {
         String dateDirectoryPath = currentDirectory + File.separator + date;
         File dateDirectory = new File(dateDirectoryPath);
