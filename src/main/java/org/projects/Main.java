@@ -1,6 +1,5 @@
 package org.projects;
 
-import net.sourceforge.tess4j.*;
 
 import java.io.File;
 

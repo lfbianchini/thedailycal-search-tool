@@ -14,27 +14,31 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>repository.groupdocs.com</id>
-            <name>GroupDocs Repository</name>
-            <url>https://releases.groupdocs.com/java/repo/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
 
+        <!-- https://mvnrepository.com/artifact/com.azure/azure-ai-documentintelligence -->
         <dependency>
             <groupId>com.azure</groupId>
-            <artifactId>azure-ai-vision-imageanalysis</artifactId>
-            <version>1.0.0-beta.2</version>
+            <artifactId>azure-ai-documentintelligence</artifactId>
+            <version>1.0.0-beta.3</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.azure/azure-core-http-netty -->
         <dependency>
-            <groupId>com.groupdocs</groupId>
-            <artifactId>groupdocs-merger</artifactId>
-            <version>24.6</version>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-core-http-netty</artifactId>
+            <version>1.15.1</version>
         </dependency>
+
+
+
+        <!-- https://mvnrepository.com/artifact/com.azure/azure-core -->
+        <dependency>
+            <groupId>com.azure</groupId>
+            <artifactId>azure-core</artifactId>
+            <version>1.49.1</version>
+        </dependency>
+
 
         <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
         <dependency>
@@ -42,6 +46,22 @@
             <artifactId>selenium-java</artifactId>
             <version>4.22.0</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/xmpbox -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>xmpbox</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+
+
 
 
     </dependencies>
