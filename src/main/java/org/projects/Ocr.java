@@ -17,8 +17,8 @@ public class Ocr {
     private static final String apiKey;
 
     static {
-        endpoint = "https://thedailycal.cognitiveservices.azure.com/";
-        apiKey = "8bc7684bd1fb4ba6a959f9c7a41effc0";
+        endpoint = "no";
+        apiKey = "no";
     }
 
     public Ocr() {
