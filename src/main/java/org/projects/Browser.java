@@ -16,9 +16,9 @@ public class Browser {
     private String url;
     private final DirectoryTool dTool;
 
-    public Browser(String url, String parentDirectory) {
+    public Browser(String url, DirectoryTool dTool) {
         this.url = url;
-        dTool = new DirectoryTool(parentDirectory);
+        this.dTool = dTool;
         driver = new ChromeDriver();
         checkIfValidUrl();
     }

@@ -7,6 +7,7 @@
     <groupId>org.projects</groupId>
     <artifactId>stanford</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>19</maven.compiler.source>
@@ -14,13 +15,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <dependencies>
 
-        <!-- https://mvnrepository.com/artifact/com.azure/azure-ai-documentintelligence -->
+
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/com.azure/azure-ai-formrecognizer -->
         <dependency>
             <groupId>com.azure</groupId>
-            <artifactId>azure-ai-documentintelligence</artifactId>
-            <version>1.0.0-beta.3</version>
+            <artifactId>azure-ai-formrecognizer</artifactId>
+            <version>4.1.9</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.azure/azure-core-http-netty -->
@@ -30,15 +32,12 @@
             <version>1.15.1</version>
         </dependency>
 
-
-
         <!-- https://mvnrepository.com/artifact/com.azure/azure-core -->
         <dependency>
             <groupId>com.azure</groupId>
             <artifactId>azure-core</artifactId>
             <version>1.49.1</version>
         </dependency>
-
 
         <!-- https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
         <dependency>
@@ -60,10 +59,31 @@
             <artifactId>xmpbox</artifactId>
             <version>3.0.2</version>
         </dependency>
-
-
-
-
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
 
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>org.projects.Main</mainClass>
+                                </manifest>
+                            </archive>
+                            <descriptorRefs>jar-with-dependencies</descriptorRefs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

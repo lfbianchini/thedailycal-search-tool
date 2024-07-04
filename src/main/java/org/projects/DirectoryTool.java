@@ -1,6 +1,11 @@
 package org.projects;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.*;
+
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
+import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 public class DirectoryTool {
     private final String parentDirectory;
@@ -8,6 +13,7 @@ public class DirectoryTool {
 
     public DirectoryTool(String parentDirectory) {
         this.parentDirectory = parentDirectory;
+        this.currentDirectory = parentDirectory;
     }
 
     public String getParentDirectory() {
@@ -18,13 +24,13 @@ public class DirectoryTool {
         return currentDirectory;
     }
 
+    public void setCurrentDirectory(String currentDirectory) {
+        this.currentDirectory = currentDirectory;
+    }
+
     public void createDirectory(String year, String date) {
         createYearDirectory(year);
         createDateDirectory(date);
-    }
-
-    public void renameFilesInCurrentDirectory() {
-
     }
 
     public void createDateDirectory(String date) {
@@ -40,7 +46,7 @@ public class DirectoryTool {
                 throw new RuntimeException("Failed to create directory: " + dateDirectory.getAbsolutePath());
             }
         } else {
-            System.out.println("Directory for date " + date + " already exists, using this directory  ");
+            System.out.println("Directory for date " + date + " already exists.. using this directory: " + dateDirectory.getAbsolutePath());
             currentDirectory = dateDirectoryPath;
         }
     }
@@ -57,7 +63,7 @@ public class DirectoryTool {
                 throw new RuntimeException("Failed to create directory: " + yearDirectory.getAbsolutePath());
             }
         } else {
-            System.out.println("Directory for year " + year + " already exists..  " + yearDirectory.getAbsolutePath());
+            System.out.println("Directory for year " + year + " already exists..  using this directory: " + yearDirectory.getAbsolutePath());
             currentDirectory = yearDirectoryPath;
         }
     }

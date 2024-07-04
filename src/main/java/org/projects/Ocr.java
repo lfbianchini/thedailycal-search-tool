@@ -1,93 +1,94 @@
 package org.projects;
 
-import com.azure.ai.documentintelligence.DocumentIntelligenceAsyncClient;
-import com.azure.ai.documentintelligence.DocumentIntelligenceClientBuilder;
-import com.azure.ai.documentintelligence.models.AnalyzeDocumentRequest;
-import com.azure.ai.documentintelligence.models.AnalyzeResult;
-import com.azure.ai.documentintelligence.models.AnalyzeResultOperation;
-import com.azure.core.credential.KeyCredential;
-import com.azure.core.util.polling.PollerFlux;
+import com.azure.ai.formrecognizer.documentanalysis.DocumentAnalysisClient;
+import com.azure.ai.formrecognizer.documentanalysis.DocumentAnalysisClientBuilder;
+import com.azure.ai.formrecognizer.documentanalysis.models.AnalyzeResult;
+import com.azure.ai.formrecognizer.documentanalysis.models.OperationResult;
+import com.azure.core.credential.AzureKeyCredential;
+import com.azure.core.util.polling.SyncPoller;
+import com.azure.core.util.BinaryData;
 
-import java.io.File;
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.nio.file.Files;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 
 public class Ocr {
-    public final DocumentIntelligenceAsyncClient client;
-    private static final String endpoint;
-    private static final String apiKey;
+    private final DocumentAnalysisClient documentClient;
 
-    static {
-        endpoint = "https://thedailycal.cognitiveservices.azure.com/";
-        apiKey = "8bc7684bd1fb4ba6a959f9c7a41effc0";
-    }
+    private static final String endpoint = "";
+    private static final String apiKey = "";
 
     public Ocr() {
-        this.client = new DocumentIntelligenceClientBuilder()
-                .credential(new KeyCredential(apiKey))
+        this.documentClient = new DocumentAnalysisClientBuilder()
+                .credential(new AzureKeyCredential(apiKey))
                 .endpoint(endpoint)
-                .buildAsyncClient();
+                .buildClient();
     }
 
-    public String findTextFromImage(File image, ArrayList<String> queries) {
+    public String findTextFromImages(String folderPath, ArrayList<String> queries) {
         StringBuilder output = new StringBuilder();
         String modelId = "prebuilt-layout";
-        String documentUrl = "https://raw.githubusercontent.com/Azure-Samples/cognitive-services-REST-api-samples/master/curl/form-recognizer/sample-layout.pdf";
 
-        PollerFlux<AnalyzeResultOperation, AnalyzeResult> analyzeLayoutPoller =
-                client.beginAnalyzeDocument(modelId,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        null,
-                        new AnalyzeDocumentRequest().setUrlSource(documentUrl));
+        File folder = new File(folderPath);
+        File[] jpgFiles = folder.listFiles((dir, name) -> name.toLowerCase().endsWith(".jpg"));
 
-        AnalyzeResult analyzeLayoutResult = analyzeLayoutPoller.getSyncPoller().getFinalResult();
+        if (jpgFiles == null || jpgFiles.length == 0) {
+            return "No JPG files found in the specified folder.";
+        }
 
-        // pages
-        analyzeLayoutResult.getPages().forEach(documentPage -> {
-                    System.out.printf("Page has width: %.2f and height: %.2f, measured with unit: %s%n",
-                            documentPage.getWidth(),
-                            documentPage.getHeight(),
-                            documentPage.getUnit());
+        Arrays.sort(jpgFiles, Comparator.comparing(File::getName));
 
-                    // lines
-                    documentPage.getLines().forEach(documentLine ->
-                            System.out.printf("Line '%s' is within a bounding polygon %s.%n",
-                                    documentLine.getContent(),
-                                    documentLine.getPolygon()));
+        for (int i = 0; i < jpgFiles.length; i++) {
+            File image = jpgFiles[i];
+            final int pageNumber = i + 1;
+            try {
+                BufferedImage resizedImage = resizeImage(ImageIO.read(image), 1300, 1023);
 
-                    // words
-                    documentPage.getWords().forEach(documentWord ->
-                            System.out.printf("Word '%s' has a confidence score of %.2f.%n",
-                                    documentWord.getContent(),
-                                    documentWord.getConfidence()));
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(resizedImage, "jpg", baos);
+                byte[] fileContent = baos.toByteArray();
+
+                BinaryData binaryData = BinaryData.fromBytes(fileContent);
+
+                System.out.println("Analyzing image: " + image.getName());
+                SyncPoller<OperationResult, AnalyzeResult> analyzeLayoutPoller =
+                        documentClient.beginAnalyzeDocument(modelId, binaryData);
+
+                AnalyzeResult analyzeLayoutResult = analyzeLayoutPoller.getFinalResult();
+
+                analyzeLayoutResult.getPages().forEach(documentPage -> {
+                    documentPage.getLines().forEach(documentLine -> {
+                        documentLine.getWords().forEach(documentWord -> {
+                            String word = documentWord.getContent().toLowerCase();
+                            if (queries.contains(word)) {
+                                output.append("Found word '").append(word)
+                                        .append("' on page ").append(pageNumber)
+                                        .append(" (file: ").append(image.getName()).append(")\n");
+                            }
+                        });
+                    });
                 });
 
+            } catch (IOException e) {
+                System.err.println("Error reading file " + image.getName() + ": " + e.getMessage());
+            } catch (Exception e) {
+                System.err.println("Error analyzing file " + image.getName() + ": " + e.getMessage());
+            }
+        }
 
-//
-//        for(DetectedTextLine detectedLine:result.getRead().getBlocks().get(0).getLines()) {
-//            System.out.println(detectedLine.getText());
-//            List<DetectedTextWord> detectedWordList = detectedLine.getWords();
-//            for (DetectedTextWord detectedWord : detectedWordList) {
-//                String word = detectedWord.getText().toLowerCase();
-//                if(queries.contains(word)) {
-//                    output.append("Found specified word ").append(word).append(" on line ").append(detectedLine.getText()).append("\n");
-//                }
-//            }
-//        }
-
-        return "test";
+        return output.toString();
     }
 
-    public static void main(String[] args) {
-        Ocr ocr = new Ocr();
-        ArrayList<String> queries = new ArrayList<>();
-        queries.add("sports");
-        queries.add("personal adjustments");
-        File img = new File("C:\\Users\\Donna\\Desktop\\stanford_proect\\stanford\\1943\\Feb. 15\\991045148619706532_C120187575_035_R.jpg");
-        System.out.println(ocr.findTextFromImage(img, queries));
-
+    private BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
+        Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+        BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+        return outputImage;
     }
 }
