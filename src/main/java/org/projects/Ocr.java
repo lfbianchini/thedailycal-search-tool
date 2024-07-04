@@ -12,8 +12,6 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.file.Files;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -48,7 +46,7 @@ public class Ocr {
             File image = jpgFiles[i];
             final int pageNumber = i + 1;
             try {
-                BufferedImage resizedImage = resizeImage(ImageIO.read(image), 1300, 1023);
+                BufferedImage resizedImage = resizeImage(ImageIO.read(image));
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ImageIO.write(resizedImage, "jpg", baos);
@@ -62,18 +60,16 @@ public class Ocr {
 
                 AnalyzeResult analyzeLayoutResult = analyzeLayoutPoller.getFinalResult();
 
-                analyzeLayoutResult.getPages().forEach(documentPage -> {
-                    documentPage.getLines().forEach(documentLine -> {
-                        documentLine.getWords().forEach(documentWord -> {
-                            String word = documentWord.getContent().toLowerCase();
-                            if (queries.contains(word)) {
-                                output.append("Found word '").append(word)
-                                        .append("' on page ").append(pageNumber)
-                                        .append(" (file: ").append(image.getName()).append(")\n");
-                            }
-                        });
+                analyzeLayoutResult.getPages().forEach(documentPage -> documentPage.getLines().forEach(documentLine -> {
+                    documentLine.getWords().forEach(documentWord -> {
+                        String word = documentWord.getContent().toLowerCase();
+                        if (queries.contains(word)) {
+                            output.append("Found word '").append(word)
+                                    .append("' on page ").append(pageNumber)
+                                    .append(" (file: ").append(image.getName()).append(")\n");
+                        }
                     });
-                });
+                }));
 
             } catch (IOException e) {
                 System.err.println("Error reading file " + image.getName() + ": " + e.getMessage());
@@ -85,9 +81,9 @@ public class Ocr {
         return output.toString();
     }
 
-    private BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
-        Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-        BufferedImage outputImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+    private BufferedImage resizeImage(BufferedImage originalImage) {
+        Image resultingImage = originalImage.getScaledInstance(1300, 1023, Image.SCALE_SMOOTH);
+        BufferedImage outputImage = new BufferedImage(1300, 1023, BufferedImage.TYPE_INT_RGB);
         outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
         return outputImage;
     }

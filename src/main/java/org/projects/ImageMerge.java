@@ -1,12 +1,10 @@
 package org.projects;
 
-import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.graphics.image.JPEGFactory;
-import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import javax.imageio.ImageIO;
@@ -17,8 +15,8 @@ import java.io.IOException;
 public class ImageMerge {
 
     private final String parentDirectory;
-    private PDDocument mergedDocument;
-    private String outputPdfFileName;
+    private final PDDocument mergedDocument;
+    private final String outputPdfFileName;
 
     public ImageMerge(String parentDirectory, String outputPdfFileName) {
         this.parentDirectory = parentDirectory;

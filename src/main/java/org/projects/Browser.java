@@ -19,12 +19,15 @@ public class Browser {
     public Browser(String url, DirectoryTool dTool) {
         this.url = url;
         this.dTool = dTool;
-        driver = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        driver = new ChromeDriver(options);
         checkIfValidUrl();
     }
 
     public void downloadPagesToDayDirectory() {
         //e.g. "The Daily Californian, Fri Jan. 3, 1975"
+        System.out.println("Downloading files...");
         String title = driver.findElement(By.cssSelector("div.metadata-row:nth-child(1) > span:nth-child(2)")).getText();
         String[] parts = title.split(",\\s");
         String date = parts[1].substring(4);
@@ -47,6 +50,7 @@ public class Browser {
         chromePrefs.put("browser.set_download_behavior", "allow");
         chromePrefs.put("download.prompt_for_download", false);
         ChromeOptions newOptions = new ChromeOptions();
+        newOptions.addArguments("--headless");
         newOptions.setExperimentalOption("prefs", chromePrefs);
         driver.quit();
         driver = new ChromeDriver(newOptions);

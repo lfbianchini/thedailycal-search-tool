@@ -1,11 +1,6 @@
 package org.projects;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.*;
-
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 public class DirectoryTool {
     private final String parentDirectory;
@@ -22,15 +17,6 @@ public class DirectoryTool {
 
     public String getCurrentDirectory() {
         return currentDirectory;
-    }
-
-    public void setCurrentDirectory(String currentDirectory) {
-        this.currentDirectory = currentDirectory;
-    }
-
-    public void createDirectory(String year, String date) {
-        createYearDirectory(year);
-        createDateDirectory(date);
     }
 
     public void createDateDirectory(String date) {
